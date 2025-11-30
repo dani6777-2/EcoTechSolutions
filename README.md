@@ -18,6 +18,7 @@
 - [Seguridad](#-seguridad)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
 - [Desarrollo](#-desarrollo)
+- [Base de Datos](#-base-de-datos)
 
 ---
 
@@ -648,7 +649,40 @@ cryptography>=46.0.0    # Autenticación segura con MySQL 8.0
 
 ---
 
-## 📚 Referencias
+## �️ Base de Datos
+
+### Documentación Interactiva
+
+Puedes explorar el esquema completo de la base de datos con todas las relaciones y tablas en:
+
+**[📊 DBDocs - EcoTech Solutions Database Schema](https://dbdocs.io/danielmorales.arias23/DBML_para_Sistema_de_Gestion_de_Empleados_EcoTech_Solutions?view=relationships)**
+
+Esta documentación interactiva incluye:
+- Vista de relaciones entre tablas
+- Esquema detallado de cada tabla
+- Tipos de datos y constraints
+- Índices y claves foráneas
+- Diagrama ER visual
+
+### Tablas Principales
+
+El sistema cuenta con 12 tablas:
+- `usuarios` - Usuarios del sistema con salt y contraseña cifrada
+- `roles` - Roles de acceso (Administrador, Gerente, Empleado)
+- `permisos` - Permisos granulares del sistema
+- `departamentos` - Departamentos de la empresa
+- `empleados` - Empleados vinculados a departamentos
+- `proyectos` - Proyectos de la empresa
+- `empleado_proyecto` - Relación muchos a muchos
+- `registros_tiempo` - Registro de horas trabajadas
+- `informes` - Informes generados
+- `logs_auditoria` - Auditoría de acciones
+- `administradores_rh` - Gestión de recursos humanos
+- `rol_permisos` - Relación muchos a muchos
+
+---
+
+## �📚 Referencias
 
 - [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
 - [Python POO](https://docs.python.org/3/tutorial/classes.html)
