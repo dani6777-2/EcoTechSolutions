@@ -663,7 +663,19 @@ Esta documentación interactiva incluye:
 - Tipos de datos y constraints
 - Índices y claves foráneas
 - Diagrama ER visual
+### Diagramas de Base de Datos
 
+#### Diagrama Entidad-Relación
+
+![Diagrama Entidad-Relación](assets/images/Diagrama%20Entidad-Relación.png)
+
+#### Esquema Completo de Base de Datos
+
+![Esquema de Base de Datos](assets/images/DBML_para_Sistema_de_Gestion_de_Empleados_EcoTech_Solutions.png)
+
+#### Cardinalidades Detalladas
+
+![Cardinalidades](assets/images/Cardinalidades%20Detalladas.png)
 ### Tablas Principales
 
 El sistema cuenta con 12 tablas:
