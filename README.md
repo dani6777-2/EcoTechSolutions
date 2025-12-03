@@ -1,6 +1,6 @@
 # EcoTech Management — Sistema de Gestión con POO Segura
 
-**Aplicación de consola con autenticación, arquitectura en 4 capas, Docker y MySQL**
+**Aplicación de consola con autenticación, arquitectura en 4 capas, Docker, MySQL y UI moderna**
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-orange.svg)](https://www.mysql.com/)
@@ -12,6 +12,7 @@
 
 - [Descripción](#descripción)
 - [Quick Start](#-quick-start)
+- [Interfaz de Usuario Moderna](#-interfaz-de-usuario-moderna)
 - [Arquitectura](#-arquitectura)
 - [Sistema de Autenticación](#-sistema-de-autenticación)
 - [Integración con API Pública](#-integración-con-api-pública-de-datos-ambientales)
@@ -34,6 +35,7 @@ Sistema completo de gestión empresarial con:
 - ✅ **Seguridad** con salt + SHA-256 hashing
 - ✅ **Gestión** de Departamentos, Proyectos, Empleados, Usuarios y Roles
 - ✅ **API Pública** integrada orgánicamente para evaluación ambiental
+- ✅ **UI Moderna** con colores ANSI, iconos y tablas formateadas
 
 ---
 
@@ -63,10 +65,13 @@ docker-compose up -d
 sleep 15  # Esperar que MySQL esté listo
 
 # 5. Inicializar roles y usuario admin
-python init_data.py
+python scripts/init_data.py
 
 # 6. Ejecutar aplicación
 python main.py
+
+# 7. (Opcional) Ver demo de UI
+python scripts/demo_ui.py
 ```
 
 ### Credenciales por Defecto
@@ -77,6 +82,176 @@ Contraseña: admin123
 ```
 
 ⚠️ **Importante:** Cambiar la contraseña del administrador después del primer login.
+
+---
+
+## 🎨 Interfaz de Usuario Moderna
+
+### Sistema UI Mejorado
+
+EcoTech Solutions cuenta con un **sistema de interfaz de usuario completamente renovado** que proporciona una experiencia visual profesional en la terminal.
+
+#### Características Principales
+
+✨ **Colores ANSI Dinámicos**
+- 🟢 Verde para éxitos y confirmaciones
+- 🔴 Rojo para errores y advertencias críticas
+- 🟡 Amarillo para advertencias y acciones pendientes
+- 🔵 Cyan para información y prompts
+- ⚪ Blanco brillante para encabezados y títulos
+
+🎯 **Más de 40 Iconos Temáticos**
+```
+🏢 Departamentos    📊 Proyectos       👤 Empleados
+👥 Usuarios         🔐 Roles           🌍 Ambiental
+➕ Agregar          ✏️ Editar          🗑️ Eliminar
+🔍 Buscar          👁️ Ver            ◀️ Volver
+✅ Éxito           ❌ Error           ⚠️ Advertencia
+```
+
+📊 **Componentes Visuales**
+- **Tablas formateadas** con headers y columnas alineadas
+- **Cajas con bordes** para destacar información importante
+- **Barras de progreso** para operaciones largas
+- **Mensajes contextuales** con iconos y colores
+- **Prompts interactivos** con formato consistente
+
+#### Demo Interactiva
+
+Explora todas las características de la UI ejecutando:
+
+```bash
+python scripts/demo_ui.py
+```
+
+El demo muestra:
+1. **Colores disponibles** - Paleta completa ANSI
+2. **Tipos de mensajes** - Éxito, error, advertencia, info
+3. **Menús formateados** - Opciones con iconos y colores
+4. **Tablas de datos** - Headers y datos alineados
+5. **Cajas decorativas** - Bordes con títulos
+6. **Barras de progreso** - Simulación de procesos
+7. **Librería de iconos** - 40+ iconos disponibles
+
+#### Ejemplos Visuales
+
+**Pantalla de Bienvenida:**
+```
+══════════════════════════════════════════════════════════════════════
+   🌱 ECOTECH SOLUTIONS
+   Gestión Empresarial Sustentable
+══════════════════════════════════════════════════════════════════════
+
+  Bienvenido/a, admin
+  Rol: Administrador
+──────────────────────────────────────────────────────────────────────
+```
+
+**Menú Principal:**
+```
+MENÚ PRINCIPAL
+──────────────────────────────────────────────────────────────────────
+1. 📊 🌍 Ver Proyectos
+2. 🏢 Gestión de Departamentos
+3. 📊 🌍 Gestión de Proyectos
+4. 👤 Gestión de Empleados
+
+5. 👥 Gestión de Usuarios
+6. 🔐 Gestión de Roles
+
+7. 🔒 Cambiar mi contraseña
+0. 🚪 Cerrar Sesión
+
+▶ Seleccione una opción
+```
+
+**Tabla de Usuarios:**
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                       👥 Usuarios del Sistema                      │
+├────────────────────────────────────────────────────────────────────┤
+│ #  │ Usuario    │ Rol            │ Estado      │ Fecha Creación   │
+├────────────────────────────────────────────────────────────────────┤
+│ 1  │ admin      │ Administrador  │ ● Activo    │ 2025-12-01      │
+│ 2  │ daniel     │ Gerente        │ ● Activo    │ 2025-12-02      │
+│ 3  │ empleado1  │ Empleado       │ ● Activo    │ 2025-12-03      │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+**Reporte de Calidad del Aire:**
+```
+──────────────────────────────────────────────────────────────
+📈 REPORTE DE CALIDAD DEL AIRE - SANTIAGO
+──────────────────────────────────────────────────────────────
+
+📈 Índice de Calidad (AQI): 2/5 - Aceptable
+
+🔬 Contaminantes principales (μg/m³):
+  • PM2.5 (Partículas finas): 15.2
+  • PM10 (Partículas):        22.8
+  • NO₂ (Dióxido nitrógeno):  18.5
+  • O₃ (Ozono):               8.3
+  • SO₂ (Dióxido azufre):     3.1
+
+──────────────────────────────────────────────────────────────
+💡 RECOMENDACIÓN PARA PROYECTOS ECOTECH
+──────────────────────────────────────────────────────────────
+
+✅ UBICACIÓN APROBADA
+  • Excelente calidad del aire
+  • Ambiente saludable para equipo de trabajo
+  • Alineado con valores de sustentabilidad EcoTech
+  • No requiere medidas especiales
+```
+
+#### Arquitectura UI
+
+```
+presentacion/
+├── ui_helpers.py          # Sistema UI completo
+│   ├── Colors             # Códigos ANSI de colores
+│   ├── UI                 # Métodos de formateo
+│   ├── Icons              # Librería de 40+ iconos
+│   └── ProgressBar        # Barras de progreso
+├── menus.py               # Menús con UI integrada
+└── auth_menus.py          # Autenticación con UI
+```
+
+**Clases Principales:**
+
+```python
+# Colores ANSI
+Colors.GREEN, Colors.RED, Colors.YELLOW, Colors.CYAN
+Colors.BOLD, Colors.DIM, Colors.RESET
+
+# Métodos de UI
+UI.print_header(title, subtitle, icon)
+UI.print_section(title, icon)
+UI.print_success(message)
+UI.print_error(message)
+UI.print_warning(message)
+UI.print_info(message)
+UI.print_table(headers, rows)
+UI.print_box(lines, title)
+UI.input_prompt(message)
+UI.confirm(question)
+UI.pause()
+
+# Iconos disponibles
+Icons.ADD, Icons.EDIT, Icons.DELETE, Icons.SEARCH
+Icons.SUCCESS, Icons.ERROR, Icons.WARNING, Icons.INFO
+Icons.DEPARTMENT, Icons.PROJECT, Icons.EMPLOYEE
+Icons.USER, Icons.ROLE, Icons.EARTH, Icons.LEAF
+```
+
+#### Beneficios de la Nueva UI
+
+✅ **Experiencia profesional** - Interfaz moderna y visualmente atractiva  
+✅ **Mejor usabilidad** - Iconos y colores mejoran la navegación  
+✅ **Feedback visual claro** - Estados de éxito/error inmediatamente visibles  
+✅ **Información organizada** - Tablas y cajas facilitan lectura de datos  
+✅ **Consistencia** - Todos los menús siguen el mismo estilo  
+✅ **Accesibilidad** - Mensajes claros y confirmaciones explícitas  
 
 ---
 
