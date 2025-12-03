@@ -2,6 +2,7 @@
 from persistencia.auth_repositorios import UsuarioRepo, RolRepo
 from dominio.auth_models import Usuario, Rol
 from dominio.security import PasswordHasher
+from presentacion.ui_helpers import UI
 
 
 class AuthService:
@@ -25,11 +26,9 @@ class AuthService:
             usuario_data = self.usuario_repo.obtener_por_nombre_usuario(nombre_usuario)
             
             if not usuario_data:
-                print("❌ Usuario no encontrado")
                 return None
             
             if not usuario_data['activo']:
-                print("❌ Usuario inactivo")
                 return None
             
             # Verificar contraseña
@@ -40,10 +39,8 @@ class AuthService:
             ):
                 # Actualizar último login
                 self.usuario_repo.actualizar_ultimo_login(usuario_data['id'])
-                print(f"✓ Bienvenido {nombre_usuario}!")
                 return usuario_data
             else:
-                print("❌ Contraseña incorrecta")
                 return None
         except Exception as e:
             print(f"Error en autenticación: {e}")
@@ -75,37 +72,27 @@ class UsuarioService:
             usuario.contrasena_cifrada = contrasena_hash
             
             self.usuario_repo.crear(usuario)
-            print(f"✓ Usuario '{usuario.nombre_usuario}' creado exitosamente")
+            UI.print_success(f"Usuario '{usuario.nombre_usuario}' creado exitosamente")
         except Exception as e:
-            print(f"Error creando usuario: {e}")
+            UI.print_error(f"Error creando usuario: {e}")
     
     def listar_usuarios(self):
         """Lista todos los usuarios (sin contraseñas)"""
         return self.usuario_repo.listar_todos()
     
-    def cambiar_contrasena(self, usuario_id: str, contrasena_actual: str, contrasena_nueva: str):
+    def cambiar_contrasena(self, usuario_id: str, contrasena_nueva: str):
         """
-        Cambia la contraseña de un usuario.
+        Cambia la contraseña de un usuario (sin verificar la actual).
         
         Args:
             usuario_id: ID del usuario
-            contrasena_actual: Contraseña actual en texto plano
             contrasena_nueva: Nueva contraseña en texto plano
         """
         try:
             usuario_data = self.usuario_repo.obtener_por_id(usuario_id)
             
             if not usuario_data:
-                print("❌ Usuario no encontrado")
-                return False
-            
-            # Verificar contraseña actual
-            if not PasswordHasher.verify_password(
-                contrasena_actual, 
-                usuario_data['salt'], 
-                usuario_data['contrasena_cifrada']
-            ):
-                print("❌ Contraseña actual incorrecta")
+                UI.print_error("Usuario no encontrado")
                 return False
             
             # Generar nuevo salt y hash
@@ -113,10 +100,10 @@ class UsuarioService:
             nuevo_hash = PasswordHasher.hash_password(contrasena_nueva, nuevo_salt)
             
             self.usuario_repo.cambiar_contrasena(usuario_id, nuevo_hash, nuevo_salt)
-            print("✓ Contraseña cambiada exitosamente")
+            UI.print_success("Contraseña cambiada exitosamente")
             return True
         except Exception as e:
-            print(f"Error cambiando contraseña: {e}")
+            UI.print_error(f"Error cambiando contraseña: {e}")
             return False
     
     def activar_desactivar_usuario(self, usuario_id: str, activo: bool):
@@ -124,9 +111,9 @@ class UsuarioService:
         try:
             self.usuario_repo.actualizar_estado(usuario_id, activo)
             estado = "activado" if activo else "desactivado"
-            print(f"✓ Usuario {estado}")
+            UI.print_success(f"Usuario {estado}")
         except Exception as e:
-            print(f"Error actualizando estado: {e}")
+            UI.print_error(f"Error actualizando estado: {e}")
 
 
 class RolService:
@@ -139,9 +126,9 @@ class RolService:
         """Crea un nuevo rol"""
         try:
             self.rol_repo.crear(rol)
-            print(f"✓ Rol '{rol.nombre}' creado")
+            UI.print_success(f"Rol '{rol.nombre}' creado")
         except Exception as e:
-            print(f"Error creando rol: {e}")
+            UI.print_error(f"Error creando rol: {e}")
     
     def listar_roles(self):
         """Lista todos los roles activos"""

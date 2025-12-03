@@ -18,9 +18,12 @@ class UsuarioRepo:
             conn.close()
     
     def obtener_por_nombre_usuario(self, nombre_usuario):
-        """Obtiene un usuario por su nombre de usuario"""
-        sql = """SELECT id, nombre_usuario, contrasena_cifrada, salt, rol_id, activo 
-                 FROM usuarios WHERE nombre_usuario = %s"""
+        """Obtiene un usuario por su nombre de usuario con información del rol"""
+        sql = """SELECT u.id, u.nombre_usuario, u.contrasena_cifrada, u.salt, 
+                        u.rol_id, u.activo, r.nivel_permisos, r.nombre as nombre_rol
+                 FROM usuarios u
+                 JOIN roles r ON u.rol_id = r.id
+                 WHERE u.nombre_usuario = %s"""
         conn = Database.get_connection()
         try:
             with conn.cursor() as cur:
