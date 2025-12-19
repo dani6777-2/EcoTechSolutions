@@ -146,3 +146,26 @@ class AdministradorRH(Base):
     usuario_id = Column(String(50), ForeignKey('usuarios.id'), nullable=False, unique=True)
     nivel_acceso = Column(Integer, default=1)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
+
+
+class LogClima(Base):
+    """Modelo SQLAlchemy para registrar consultas de calidad del aire"""
+    __tablename__ = 'logs_clima'
+    
+    id = Column(String(50), primary_key=True)
+    ciudad = Column(String(200), nullable=False)
+    pais = Column(String(10), nullable=False)
+    aqi = Column(Integer, nullable=False)
+    co = Column(DECIMAL(10, 2), nullable=True)
+    no2 = Column(DECIMAL(10, 2), nullable=True)
+    o3 = Column(DECIMAL(10, 2), nullable=True)
+    so2 = Column(DECIMAL(10, 2), nullable=True)
+    pm2_5 = Column(DECIMAL(10, 2), nullable=True)
+    pm10 = Column(DECIMAL(10, 2), nullable=True)
+    nh3 = Column(DECIMAL(10, 2), nullable=True)
+    latitud = Column(DECIMAL(10, 6), nullable=True)
+    longitud = Column(DECIMAL(10, 6), nullable=True)
+    usuario_id = Column(String(50), ForeignKey('usuarios.id'), nullable=True)
+    proyecto_id = Column(String(50), ForeignKey('proyectos.id'), nullable=True)
+    fecha_consulta = Column(TIMESTAMP, server_default=func.current_timestamp())
+    created_at = Column(TIMESTAMP, server_default=func.current_timestamp())

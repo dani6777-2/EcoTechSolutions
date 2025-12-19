@@ -72,3 +72,51 @@ class Empleado:
 
     def __repr__(self):
         return f"Empleado(id={self.id}, nombre={self.nombre}, email={self.email})"
+
+
+class LogClima:
+    """Modelo de dominio para registrar consultas de calidad del aire"""
+    
+    def __init__(self, id: str, ciudad: str, pais: str, aqi: int, 
+                 co: float = None, no2: float = None, o3: float = None, 
+                 so2: float = None, pm2_5: float = None, pm10: float = None, 
+                 nh3: float = None, usuario_id: str = None, proyecto_id: str = None,
+                 latitud: float = None, longitud: float = None):
+        self.id = id
+        self.ciudad = ciudad
+        self.pais = pais
+        self.aqi = aqi
+        self.co = co
+        self.no2 = no2
+        self.o3 = o3
+        self.so2 = so2
+        self.pm2_5 = pm2_5
+        self.pm10 = pm10
+        self.nh3 = nh3
+        self.usuario_id = usuario_id
+        self.proyecto_id = proyecto_id
+        self.latitud = latitud
+        self.longitud = longitud
+    
+    @property
+    def ciudad(self):
+        return self._ciudad
+    
+    @ciudad.setter
+    def ciudad(self, value):
+        if not value or len(value) < 2:
+            raise ValueError("El nombre de la ciudad debe tener al menos 2 caracteres")
+        self._ciudad = value
+    
+    @property
+    def aqi(self):
+        return self._aqi
+    
+    @aqi.setter
+    def aqi(self, value):
+        if not isinstance(value, int) or value < 1 or value > 5:
+            raise ValueError("El AQI debe ser un entero entre 1 y 5")
+        self._aqi = value
+    
+    def __repr__(self):
+        return f"LogClima(ciudad={self.ciudad}, pais={self.pais}, aqi={self.aqi})"

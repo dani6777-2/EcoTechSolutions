@@ -78,6 +78,10 @@ class DepartamentosMenu(MenuBase):
 
 
 class ProyectosMenu(MenuBase):
+    def __init__(self, servicio, usuario_id=None):
+        super().__init__(servicio)
+        self.usuario_id = usuario_id
+    
     def mostrar(self):
         UI.print_section("Gestión de Proyectos", f"{Icons.PROJECT} {Icons.EARTH}")
         UI.print_menu_option("1", "Agregar proyecto", Icons.ADD)
@@ -86,8 +90,13 @@ class ProyectosMenu(MenuBase):
         UI.print_menu_option("4", "Buscar por nombre", Icons.SEARCH)
         UI.print_menu_option("5", "Modificar", Icons.EDIT)
         UI.print_menu_option("6", "Eliminar", Icons.DELETE)
+        print()
         UI.print_menu_option("7", "Evaluar calidad del aire", f"{Icons.EARTH} {Icons.AIR}")
-        UI.print_menu_option("8", "Volver", Icons.BACK)
+        UI.print_menu_option("8", "Ver historial de consultas de clima", f"{Icons.VIEW} {Icons.CLOUD}")
+        UI.print_menu_option("9", "Ver logs por ciudad", f"{Icons.SEARCH} {Icons.EARTH}")
+        UI.print_menu_option("10", "Ver ciudades consultadas", f"{Icons.CHART} {Icons.EARTH}")
+        print()
+        UI.print_menu_option("0", "Volver", Icons.BACK)
 
     def ejecutar(self):
         while True:
@@ -145,11 +154,17 @@ class ProyectosMenu(MenuBase):
             elif opcion == '7':
                 self._evaluar_calidad_aire()
             elif opcion == '8':
+                self._ver_historial_logs()
+            elif opcion == '9':
+                self._ver_logs_por_ciudad()
+            elif opcion == '10':
+                self._ver_ciudades_consultadas()
+            elif opcion == '0':
                 break
             else:
                 UI.print_error("Opción inválida")
             
-            if opcion != '8':
+            if opcion != '0':
                 UI.pause()
     
     def _agregar_proyecto(self):
@@ -170,7 +185,11 @@ class ProyectosMenu(MenuBase):
             pais = UI.input_prompt("Código de país (ej: CL, AR, PE) [CL]", Icons.EARTH).upper() or "CL"
             
             print(f"\n{Colors.BRIGHT_CYAN}🔍 Consultando calidad del aire en {ciudad}, {pais}...{Colors.RESET}")
-            datos = self.servicio.obtener_calidad_aire_por_ciudad(ciudad, pais)
+            datos = self.servicio.obtener_calidad_aire_por_ciudad(
+                ciudad, pais,
+                usuario_id=self.usuario_id,
+                guardar_log=True
+            )
             
             if datos:
                 self._mostrar_reporte_calidad_aire(datos, ciudad)
@@ -217,7 +236,11 @@ class ProyectosMenu(MenuBase):
         pais = UI.input_prompt("Código de país (ej: CL, AR, PE) [CL]", Icons.EARTH).upper() or "CL"
         
         print(f"\n{Colors.BRIGHT_CYAN}🔍 Consultando calidad del aire en {ciudad}, {pais}...{Colors.RESET}")
-        datos = self.servicio.obtener_calidad_aire_por_ciudad(ciudad, pais)
+        datos = self.servicio.obtener_calidad_aire_por_ciudad(
+            ciudad, pais, 
+            usuario_id=self.usuario_id,
+            guardar_log=True
+        )
         
         if datos:
             self._mostrar_reporte_calidad_aire(datos, ciudad)
@@ -278,6 +301,127 @@ class ProyectosMenu(MenuBase):
             print(f"  {Colors.BRIGHT_BLACK}•{Colors.RESET} No alineado con valores de sustentabilidad")
             print(f"  {Colors.BRIGHT_BLACK}•{Colors.RESET} Sugerencia: Buscar ubicación alternativa")
             print(f"  {Colors.BRIGHT_BLACK}•{Colors.RESET} Considerar trabajo remoto si proyecto es crítico")
+    
+    def _ver_historial_logs(self):
+        """Muestra historial completo de consultas de clima"""
+        UI.print_section("HISTORIAL DE CONSULTAS DE CLIMA", f"{Icons.VIEW} {Icons.CLOUD}")
+        
+        logs = self.servicio.listar_logs_clima(limit=50)
+        
+        if not logs:
+            UI.print_warning("No hay registros de consultas de clima")
+            UI.pause()
+            return
+        
+        from aplicacion.api_client import EcoAPIClient
+        
+        print(f"\n{Colors.BRIGHT_CYAN}Mostrando últimas {len(logs)} consultas:{Colors.RESET}\n")
+        
+        for idx, log in enumerate(logs, 1):
+            ciudad = log.get('ciudad', 'N/A')
+            pais = log.get('pais', 'N/A')
+            aqi = log.get('aqi', 0)
+            fecha = log.get('fecha_consulta', 'N/A')
+            interpretacion = EcoAPIClient.interpretar_aqi(aqi)
+            
+            # Color según AQI
+            if aqi <= 2:
+                color = Colors.GREEN
+            elif aqi == 3:
+                color = Colors.YELLOW
+            else:
+                color = Colors.RED
+            
+            print(f"{Colors.BRIGHT_WHITE}{idx}. {ciudad}, {pais}{Colors.RESET}")
+            print(f"   AQI: {color}{aqi}/5 - {interpretacion}{Colors.RESET}")
+            print(f"   PM2.5: {log.get('pm2_5', 'N/A')} μg/m³ | PM10: {log.get('pm10', 'N/A')} μg/m³")
+            print(f"   Fecha: {Colors.DIM}{fecha}{Colors.RESET}")
+            print()
+        
+        UI.pause()
+    
+    def _ver_logs_por_ciudad(self):
+        """Muestra logs filtrados por ciudad"""
+        UI.print_section("CONSULTAS POR CIUDAD", f"{Icons.SEARCH} {Icons.EARTH}")
+        
+        ciudad = UI.input_prompt("Nombre de la ciudad", Icons.EARTH)
+        if not ciudad:
+            UI.print_error("Debe ingresar una ciudad")
+            UI.pause()
+            return
+        
+        logs = self.servicio.listar_logs_por_ciudad(ciudad, limit=50)
+        
+        if not logs:
+            UI.print_warning(f"No se encontraron consultas para '{ciudad}'")
+            UI.pause()
+            return
+        
+        from aplicacion.api_client import EcoAPIClient
+        
+        print(f"\n{Colors.BRIGHT_CYAN}Resultados para '{ciudad}': {len(logs)} consultas{Colors.RESET}\n")
+        
+        for idx, log in enumerate(logs, 1):
+            aqi = log.get('aqi', 0)
+            fecha = log.get('fecha_consulta', 'N/A')
+            interpretacion = EcoAPIClient.interpretar_aqi(aqi)
+            
+            # Color según AQI
+            if aqi <= 2:
+                color = Colors.GREEN
+            elif aqi == 3:
+                color = Colors.YELLOW
+            else:
+                color = Colors.RED
+            
+            print(f"{Colors.BRIGHT_WHITE}{idx}. {log.get('ciudad', 'N/A')}, {log.get('pais', 'N/A')}{Colors.RESET}")
+            print(f"   AQI: {color}{aqi}/5 - {interpretacion}{Colors.RESET}")
+            print(f"   PM2.5: {log.get('pm2_5', 'N/A')} | PM10: {log.get('pm10', 'N/A')} | NO₂: {log.get('no2', 'N/A')}")
+            print(f"   O₃: {log.get('o3', 'N/A')} | SO₂: {log.get('so2', 'N/A')}")
+            print(f"   Fecha: {Colors.DIM}{fecha}{Colors.RESET}")
+            print()
+        
+        # Mostrar estadísticas si hay datos
+        stats = self.servicio.obtener_estadisticas_ciudad(ciudad)
+        if stats:
+            UI.print_section(f"ESTADÍSTICAS - {ciudad.upper()}", Icons.CHART)
+            UI.print_item("Total de consultas", stats.get('total_consultas', 'N/A'))
+            UI.print_item("AQI promedio", f"{stats.get('aqi_promedio', 0):.1f}/5")
+            UI.print_item("AQI máximo", f"{stats.get('aqi_maximo', 'N/A')}/5")
+            UI.print_item("AQI mínimo", f"{stats.get('aqi_minimo', 'N/A')}/5")
+            UI.print_item("PM2.5 promedio", f"{stats.get('pm2_5_promedio', 0):.2f} μg/m³")
+            UI.print_item("PM10 promedio", f"{stats.get('pm10_promedio', 0):.2f} μg/m³")
+            UI.print_item("Última consulta", stats.get('ultima_consulta', 'N/A'))
+        
+        UI.pause()
+    
+    def _ver_ciudades_consultadas(self):
+        """Muestra lista de ciudades únicas consultadas"""
+        UI.print_section("CIUDADES CONSULTADAS", f"{Icons.CHART} {Icons.EARTH}")
+        
+        ciudades = self.servicio.listar_ciudades_consultadas()
+        
+        if not ciudades:
+            UI.print_warning("No hay ciudades consultadas")
+            UI.pause()
+            return
+        
+        print(f"\n{Colors.BRIGHT_CYAN}Total de ciudades consultadas: {len(ciudades)}{Colors.RESET}\n")
+        
+        headers = ["#", "Ciudad", "País", "Consultas"]
+        rows = []
+        
+        for idx, ciudad in enumerate(ciudades, 1):
+            rows.append([
+                str(idx),
+                ciudad.get('ciudad', 'N/A'),
+                ciudad.get('pais', 'N/A'),
+                str(ciudad.get('consultas', 0))
+            ])
+        
+        UI.print_table(headers, rows)
+        
+        UI.pause()
 
 
 class EmpleadosMenu(MenuBase):
@@ -544,16 +688,16 @@ class MainMenu:
             if opcion == '1' and self.nivel_permisos >= 3:
                 if self.nivel_permisos < 7:
                     # Empleados solo pueden ver, no modificar
-                    ProyectosMenuSoloLectura(self.servicio_proyectos).ejecutar()
+                    ProyectosMenuSoloLectura(self.servicio_proyectos, self.usuario_actual['id']).ejecutar()
                 else:
                     # Gerentes y admins tienen acceso completo
-                    ProyectosMenu(self.servicio_proyectos).ejecutar()
+                    ProyectosMenu(self.servicio_proyectos, self.usuario_actual['id']).ejecutar()
             
             # GERENTE (nivel 7+): Gestión completa
             elif opcion == '2' and self.nivel_permisos >= 7:
                 DepartamentosMenu(self.servicio_departamentos).ejecutar()
             elif opcion == '3' and self.nivel_permisos >= 7:
-                ProyectosMenu(self.servicio_proyectos).ejecutar()
+                ProyectosMenu(self.servicio_proyectos, self.usuario_actual['id']).ejecutar()
             elif opcion == '4' and self.nivel_permisos >= 7:
                 EmpleadosMenu(self.servicio_empleados, self.servicio_usuarios, self.servicio_roles).ejecutar()
             
@@ -615,6 +759,10 @@ class MainMenu:
 class ProyectosMenuSoloLectura(MenuBase):
     """Menú de solo lectura para empleados"""
     
+    def __init__(self, servicio, usuario_id=None):
+        super().__init__(servicio)
+        self.usuario_id = usuario_id
+    
     def mostrar(self):
         UI.print_section(f"{Icons.PROJECT} {Icons.EARTH} Proyectos (Solo Consulta)", Icons.VIEW)
         UI.print_menu_option("1", "Mostrar Todos", Icons.VIEW)
@@ -673,7 +821,11 @@ class ProyectosMenuSoloLectura(MenuBase):
         pais = UI.input_prompt("Código de país (ej: CL, AR, PE) [CL]").upper() or "CL"
         
         print(f"\n{Colors.CYAN}{Icons.SEARCH} Consultando calidad del aire en {ciudad}, {pais}...{Colors.RESET}")
-        datos = self.servicio.obtener_calidad_aire_por_ciudad(ciudad, pais)
+        datos = self.servicio.obtener_calidad_aire_por_ciudad(
+            ciudad, pais,
+            usuario_id=self.usuario_id,
+            guardar_log=True
+        )
         
         if datos:
             self._mostrar_reporte_calidad_aire(datos, ciudad)
